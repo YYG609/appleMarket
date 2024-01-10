@@ -10,7 +10,7 @@ data class MyItem(
     val itemExplain: String,
     val itemSeller: String,
     val itemAddress: String,
-    val itemPrice: String,
+    val itemPrice: Int,
     val chat: Int,
     val like: Int
-): Parcelable
+) : Parcelable
