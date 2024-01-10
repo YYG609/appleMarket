@@ -10,6 +10,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.view.animation.AlphaAnimation
 import android.widget.ArrayAdapter
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
@@ -17,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.VERTICAL
 import com.android.applemarket.databinding.ActivityMainBinding
 
@@ -213,6 +215,47 @@ class MainActivity : AppCompatActivity() {
         binding.ibNotification.setOnClickListener {
             notification()
         }
+
+        // 플로팅 버튼(페이드효과) - 스크롤 상단 이동
+        // AlphaAnimation()를 이용해 괄호 안의 숫자는 투명도를 의미한다
+        // 괄호 안의 숫자는 float 형이고 범위는 0.0 ~ 1.0
+        // setDuration을 이용해 지속시간을 설정한다 (지정해준 투명도를 몇초동안 실행할 것인지. 100 = 1초)
+        val fadeIn = AlphaAnimation(0f, 1f).apply { duration = 500 }
+        val fadeOut = AlphaAnimation(1f, 0f).apply { duration = 500 }
+        // isTop 변수를 선언해서 true일 때 최상단, false일 때 최상단이 아님을 구분지어준다
+        var isTop = true
+
+        // 플로팅 버튼(스크롤리스너 재정의) - 스크롤 상단 이동
+        // recyclerView의 Scroll 상태변화에 따라 변화를 주어야 하므로 이름 감지하기 위해서
+        // RecyclerView의 addOnScrollListener를 이용하여 onScrollStateChanged(스크롤 상태가 변경될 때마다 호출)를 재정의하고
+        // 스크롤을 움직일 때마다 canScrollVertically 메서드를 이용하여 확인하면 된다
+        binding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                // canScrollVertically = 특정 방향으로 수직 스크롤을 할 수 있는지 확인하며 음수(-1)일 경우 최상단, 양수(1)일 경우 최하단을 확인한다
+                // 결과 값으로 스크롤 될 수 있으면 true, 그렇지 않으면 false를 반환한다
+                // SCROLL_STATE_IDLE = 현재 스크롤 되지 않는 상태
+                // 스크롤에 인한 중복 발생을 방지하기 위해서 조건에 추가해준다
+                if (!binding.recyclerView.canScrollVertically(-1) && newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    binding.fbFloating.startAnimation(fadeOut)
+                    // GONE = 보이지 않고 어떤 이벤트, 동작도 하지 않지만 자리는 차지하는 INVISIBLE과 다르게 자리조차 차지하지 않는다
+                    binding.fbFloating.visibility = View.GONE
+                    isTop = true
+                } else {
+                    if (isTop) {
+                        binding.fbFloating.startAnimation(fadeIn)
+                        binding.fbFloating.visibility = View.VISIBLE
+                        isTop = false
+                    }
+                }
+            }
+        })
+        // 플로팅 버튼(클릭 이벤트 처리) - 스크롤 상단 이동
+        binding.fbFloating.setOnClickListener {
+            // smoothScrollToPosition(0) = 리스트의 0번째 항목으로 부드럽게 이동한다
+            binding.recyclerView.smoothScrollToPosition(0)
+        }
+
     }
 
     // 알림 기능
