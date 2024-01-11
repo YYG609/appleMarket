@@ -13,6 +13,8 @@ import android.view.View
 import android.view.animation.AlphaAnimation
 import android.widget.ArrayAdapter
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
@@ -24,6 +26,7 @@ import com.android.applemarket.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
     private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
+    lateinit var activityResultLauncher: ActivityResultLauncher<Intent>
 
     // 콜백 인스턴스 생성
     private val callback = object : OnBackPressedCallback(true) {
@@ -79,7 +82,7 @@ class MainActivity : AppCompatActivity() {
         )
         dataList.add(
             MyItem(
-                R.drawable.sample2, "김치냉장고", "이사로인해 내놔요", "안마담", "인천 계양구 귤현동", 20000, 28, 8,false
+                R.drawable.sample2, "김치냉장고", "이사로인해 내놔요", "안마담", "인천 계양구 귤현동", 20000, 28, 8, false
             )
         )
         dataList.add(
@@ -130,7 +133,7 @@ class MainActivity : AppCompatActivity() {
                 "수원시 영통구 원천동",
                 50000,
                 16,
-                25,false
+                25, false
             )
         )
         dataList.add(
@@ -205,27 +208,48 @@ class MainActivity : AppCompatActivity() {
                 // Intent로 데이터를 DetailActivity로 보내준다
                 val intent = Intent(this@MainActivity, DetailActivity::class.java)
                 intent.putExtra(Const.ITEM_OBJECT, selectedItem)
-                startActivity(intent)
+                intent.putExtra(Const.ITEM_INDEX, position)
+                activityResultLauncher.launch(intent)
             }
         }
 
         // 롱클릭 시 다이얼로그 및 아이템 삭제
-        adapter.itemLongClick = object :MyAdapter.ItemLongClick{
+        adapter.itemLongClick = object : MyAdapter.ItemLongClick {
             override fun onLongClick(view: View, position: Int) {
                 val removeDialog = AlertDialog.Builder(this@MainActivity)
                 removeDialog.setIcon(R.drawable.chat)
                 removeDialog.setTitle("상품 삭제")
                 removeDialog.setMessage("상품을 정말 삭제하시겠습니까?")
-                removeDialog.setPositiveButton("확인"){ dialog, _ ->
+                removeDialog.setPositiveButton("확인") { dialog, _ ->
                     dataList.removeAt(position)
                     adapter.notifyItemRemoved(position)
                 }
-                removeDialog.setNegativeButton("취소"){ dialog, _ ->
+                removeDialog.setNegativeButton("취소") { dialog, _ ->
                     dialog.dismiss()
                 }
                 removeDialog.show()
             }
         }
+
+        // 좋아요 기능
+        activityResultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                if (it.resultCode == RESULT_OK) {
+                    val itemIndex = it.data?.getIntExtra("itemIndex", 0) as Int
+                    val isLike = it.data?.getBooleanExtra("isLike", false) as Boolean
+
+                    if (isLike) {
+                        dataList[itemIndex].isLike = true
+                        dataList[itemIndex].like += 1
+                    } else {
+                        if (dataList[itemIndex].isLike) {
+                            dataList[itemIndex].isLike = false
+                            dataList[itemIndex].like -= 1
+                        }
+                    }
+                    adapter.notifyItemChanged(itemIndex)
+                }
+            }
 
         // Spinner 리스트
         val village = arrayOf("내배캠동", "스파르타동", "코딩클럽동")
@@ -245,7 +269,7 @@ class MainActivity : AppCompatActivity() {
         // 플로팅 버튼(페이드효과) - 스크롤 상단 이동
         // AlphaAnimation()를 이용해 괄호 안의 숫자는 투명도를 의미한다
         // 괄호 안의 숫자는 float 형이고 범위는 0.0 ~ 1.0
-        // setDuration을 이용해 지속시간을 설정한다 (지정해준 투명도를 몇초동안 실행할 것인지. 100 = 1초)
+        // setDuration을 이용해 지속시간을 설정한다 (지정해준 투명도를 몇초동안 실행할 것인지. 1000 = 1초)
         val fadeIn = AlphaAnimation(0f, 1f).apply { duration = 500 }
         val fadeOut = AlphaAnimation(1f, 0f).apply { duration = 500 }
         // isTop 변수를 선언해서 true일 때 최상단, false일 때 최상단이 아님을 구분지어준다
@@ -263,6 +287,7 @@ class MainActivity : AppCompatActivity() {
                 // SCROLL_STATE_IDLE = 현재 스크롤 되지 않는 상태
                 // 스크롤에 인한 중복 발생을 방지하기 위해서 조건에 추가해준다
                 if (!binding.recyclerView.canScrollVertically(-1) && newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    // 순서 중요 // 페이드 아웃 후 GONE
                     binding.fbFloating.startAnimation(fadeOut)
                     // View.INVISIBLEG = 보이지 않고 어떤 이벤트, 동작도 하지 않지만 자리는 차지
                     // View.GONE = 보이자 않고 어떤 이벤트, 동작도 하지 않으며 자리조차 차지 x
@@ -270,8 +295,9 @@ class MainActivity : AppCompatActivity() {
                     isTop = true
                 } else {
                     if (isTop) {
-                        binding.fbFloating.startAnimation(fadeIn)
+                        // 순서 중요 // VISIBLE 후 페이드인 효과
                         binding.fbFloating.visibility = View.VISIBLE
+                        binding.fbFloating.startAnimation(fadeIn)
                         isTop = false
                     }
                 }
@@ -282,7 +308,6 @@ class MainActivity : AppCompatActivity() {
             // smoothScrollToPosition(0) = 리스트의 0번째 항목으로 부드럽게 이동한다
             binding.recyclerView.smoothScrollToPosition(0)
         }
-
     }
 
     // 알림 기능

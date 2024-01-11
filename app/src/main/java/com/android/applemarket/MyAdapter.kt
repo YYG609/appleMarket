@@ -14,13 +14,15 @@ class MyAdapter(val mItems: MutableList<MyItem>) : RecyclerView.Adapter<MyAdapte
     interface ItemClick {
         fun onClick(view: View, position: Int)
     }
+
     // 롱클릭 이벤트 추가 부분
-    interface  ItemLongClick {
-        fun onLongClick(view:View, position: Int)
+    interface ItemLongClick {
+        fun onLongClick(view: View, position: Int)
     }
 
     // 클릭 이벤트 추가 부분
     var itemClick: ItemClick? = null
+
     // 롱클릭 이벤트 추가 부분
     var itemLongClick: ItemLongClick? = null
 
@@ -62,6 +64,12 @@ class MyAdapter(val mItems: MutableList<MyItem>) : RecyclerView.Adapter<MyAdapte
         holder.itemPrice.text = "${dec.format(mItems[position].itemPrice)}원"
         holder.chat.text = mItems[position].chat.toString()
         holder.like.text = mItems[position].like.toString()
+
+        if (mItems[position].isLike) {
+            holder.AdapterLike.setImageResource(R.drawable.heart2)
+        } else {
+            holder.AdapterLike.setImageResource(R.drawable.heart)
+        }
     }
 
     override fun getItemId(position: Int): Long {
@@ -83,5 +91,6 @@ class MyAdapter(val mItems: MutableList<MyItem>) : RecyclerView.Adapter<MyAdapte
         val itemPrice = binding.tvItemPrice
         val chat = binding.tvChat
         val like = binding.tvHeart
+        val AdapterLike = binding.ivHeart
     }
 }
