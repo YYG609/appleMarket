@@ -15,9 +15,15 @@ class MyAdapter(val mItems: MutableList<MyItem>) : RecyclerView.Adapter<MyAdapte
     interface ItemClick {
         fun onClick(view: View, position: Int)
     }
+    // 롱클릭 이벤트 추가 부분
+//    interface  ItemLongClick {
+//        fun onLongClick(view:View, position: Int)
+//    }
 
     // 클릭 이벤트 추가 부분
     var itemClick: ItemClick? = null
+    // 롱클릭 이벤트 추가 부분
+//    var itemLongClick: ItemLongClick? = null
 
     // 리사이클러 뷰가 자동으로 호출시키는 메서드
     // viewHolder가 생성되는 함수, 여기서 veiwHolder 객체를 반환한다
@@ -39,7 +45,6 @@ class MyAdapter(val mItems: MutableList<MyItem>) : RecyclerView.Adapter<MyAdapte
     override fun onBindViewHolder(holder: Holder, position: Int) {
         // 상품 가격 1000단위 콤마(,)
         val dec = DecimalFormat("#,###")
-
         // 인터페이스
         // 클릭 이벤트 추가 부분(여기서 해도 됨) / 지금 이 코드에선 클릭이벤트 받아서 매인엑티비티에 보내주고 메인액티비티에서 처리함
         // 메인 액티비티로 보내주려면 메인액티비티랑 어뎁터 사이에 통신가능한 인터페이스를 생성해줘야 한다 = 14라인

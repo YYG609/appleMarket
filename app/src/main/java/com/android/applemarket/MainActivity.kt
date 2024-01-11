@@ -145,7 +145,7 @@ class MainActivity : AppCompatActivity() {
             MyItem(
                 R.drawable.sample8,
                 "샤넬 탑핸들 가방",
-                "샤넬 트랜디 CC 탑핸들 스몰 램스킨 블랙 금장 플랩백 !\n + \"\n\" + \"색상 : 블랙\n\" + \"사이즈 : 25.5cm * 17.5cm * 8cm\n\" + \"구성 : 본품더스트\n\" + \"\n\" + \"급하게 돈이 필요해서 팝니다 ㅠ ㅠ",
+                "샤넬 트랜디 CC 탑핸들 스몰 램스킨 블랙 금장 플랩백 !\n  \n색상 : 블랙\n사이즈 : 25.5cm * 17.5cm * 8cm\n구성 : 본품더스트\n\n급하게 돈이 필요해서 팝니다 ㅠ ㅠ",
                 "난쉽",
                 "동래구 온천제2동",
                 180000,
@@ -200,6 +200,14 @@ class MainActivity : AppCompatActivity() {
                 startActivity(intent)
             }
         }
+
+        // 롱클릭 시 아이템 삭제
+//        adapter.itemLongClick = object :MyAdapter.ItemLongClick{
+//            override fun onLongClick(view: View, position: Int) {
+//                val selectedItem = dataList[position]
+//                dataList.remove(selectedItem)
+//            }
+//        }
 
         // Spinner 리스트
         val village = arrayOf("내배캠동", "스파르타동", "코딩클럽동")
