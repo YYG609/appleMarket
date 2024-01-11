@@ -73,12 +73,13 @@ class MainActivity : AppCompatActivity() {
                 "서울 서대문구 창천동",
                 1000,
                 25,
-                13
+                13,
+                false
             )
         )
         dataList.add(
             MyItem(
-                R.drawable.sample2, "김치냉장고", "이사로인해 내놔요", "안마담", "인천 계양구 귤현동", 20000, 28, 8
+                R.drawable.sample2, "김치냉장고", "이사로인해 내놔요", "안마담", "인천 계양구 귤현동", 20000, 28, 8,false
             )
         )
         dataList.add(
@@ -90,7 +91,8 @@ class MainActivity : AppCompatActivity() {
                 "수성구 범어동",
                 10000,
                 5,
-                14
+                14,
+                false
             )
         )
         dataList.add(
@@ -102,7 +104,8 @@ class MainActivity : AppCompatActivity() {
                 "해운대구 우제2동",
                 10000,
                 17,
-                14
+                14,
+                false
             )
         )
         dataList.add(
@@ -114,7 +117,8 @@ class MainActivity : AppCompatActivity() {
                 "수원시",
                 150000,
                 9,
-                22
+                22,
+                false
             )
         )
         dataList.add(
@@ -126,7 +130,7 @@ class MainActivity : AppCompatActivity() {
                 "수원시 영통구 원천동",
                 50000,
                 16,
-                25
+                25,false
             )
         )
         dataList.add(
@@ -138,7 +142,8 @@ class MainActivity : AppCompatActivity() {
                 "남구 옥동",
                 150000,
                 54,
-                142
+                142,
+                false
             )
         )
         dataList.add(
@@ -150,7 +155,8 @@ class MainActivity : AppCompatActivity() {
                 "동래구 온천제2동",
                 180000,
                 7,
-                31
+                31,
+                false
             )
         )
         dataList.add(
@@ -162,7 +168,8 @@ class MainActivity : AppCompatActivity() {
                 "원주시 명륜2동",
                 30000,
                 28,
-                7
+                7,
+                false
             )
         )
         dataList.add(
@@ -174,7 +181,8 @@ class MainActivity : AppCompatActivity() {
                 "중구 동화동",
                 190000,
                 6,
-                40
+                40,
+                false
             )
         )
 
@@ -196,18 +204,28 @@ class MainActivity : AppCompatActivity() {
                 val selectedItem = dataList[position]
                 // Intent로 데이터를 DetailActivity로 보내준다
                 val intent = Intent(this@MainActivity, DetailActivity::class.java)
-                intent.putExtra("MyItem", selectedItem)
+                intent.putExtra(Const.ITEM_OBJECT, selectedItem)
                 startActivity(intent)
             }
         }
 
-        // 롱클릭 시 아이템 삭제
-//        adapter.itemLongClick = object :MyAdapter.ItemLongClick{
-//            override fun onLongClick(view: View, position: Int) {
-//                val selectedItem = dataList[position]
-//                dataList.remove(selectedItem)
-//            }
-//        }
+        // 롱클릭 시 다이얼로그 및 아이템 삭제
+        adapter.itemLongClick = object :MyAdapter.ItemLongClick{
+            override fun onLongClick(view: View, position: Int) {
+                val removeDialog = AlertDialog.Builder(this@MainActivity)
+                removeDialog.setIcon(R.drawable.chat)
+                removeDialog.setTitle("상품 삭제")
+                removeDialog.setMessage("상품을 정말 삭제하시겠습니까?")
+                removeDialog.setPositiveButton("확인"){ dialog, _ ->
+                    dataList.removeAt(position)
+                    adapter.notifyItemRemoved(position)
+                }
+                removeDialog.setNegativeButton("취소"){ dialog, _ ->
+                    dialog.dismiss()
+                }
+                removeDialog.show()
+            }
+        }
 
         // Spinner 리스트
         val village = arrayOf("내배캠동", "스파르타동", "코딩클럽동")
@@ -246,7 +264,8 @@ class MainActivity : AppCompatActivity() {
                 // 스크롤에 인한 중복 발생을 방지하기 위해서 조건에 추가해준다
                 if (!binding.recyclerView.canScrollVertically(-1) && newState == RecyclerView.SCROLL_STATE_IDLE) {
                     binding.fbFloating.startAnimation(fadeOut)
-                    // GONE = 보이지 않고 어떤 이벤트, 동작도 하지 않지만 자리는 차지하는 INVISIBLE과 다르게 자리조차 차지하지 않는다
+                    // View.INVISIBLEG = 보이지 않고 어떤 이벤트, 동작도 하지 않지만 자리는 차지
+                    // View.GONE = 보이자 않고 어떤 이벤트, 동작도 하지 않으며 자리조차 차지 x
                     binding.fbFloating.visibility = View.GONE
                     isTop = true
                 } else {

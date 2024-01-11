@@ -41,9 +41,9 @@ class DetailActivity : AppCompatActivity() {
         // MainActivity에서 Intent로 넘겨준 데이터 DetailActivity에서 받기
         // getParcelableExtra<클래스타입>으로 Parcelable 객체를 전달 받는다
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableExtra("MyItem", com.android.applemarket.MyItem::class.java)
+            intent.getParcelableExtra(Const.ITEM_OBJECT, com.android.applemarket.MyItem::class.java)
         } else {
-            intent.getParcelableExtra<MyItem>("MyItem")
+            intent.getParcelableExtra<MyItem>(Const.ITEM_OBJECT)
         }
     }
 }

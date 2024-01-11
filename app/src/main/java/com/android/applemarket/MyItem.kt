@@ -12,5 +12,6 @@ data class MyItem(
     val itemAddress: String,
     val itemPrice: Int,
     val chat: Int,
-    val like: Int
+    var like: Int,
+    var isLike : Boolean
 ) : Parcelable
