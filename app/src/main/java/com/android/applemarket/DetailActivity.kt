@@ -70,6 +70,7 @@ class DetailActivity : AppCompatActivity() {
     }
 
     // 뒤로가기 버튼 exit() 정의
+    // Back버튼과 좋아요 기능 때문에 따로 정의
     fun exit() {
         val intent = Intent(this, MainActivity::class.java).apply {
             putExtra("itemIndex", itemPosition)

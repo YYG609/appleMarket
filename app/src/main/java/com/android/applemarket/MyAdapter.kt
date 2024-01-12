@@ -11,6 +11,7 @@ import java.text.DecimalFormat
 class MyAdapter(val mItems: MutableList<MyItem>) : RecyclerView.Adapter<MyAdapter.Holder>() {
 
     // 클릭 이벤트 추가 부분
+    // 인터페이스는 함수에 대한 구현체는 없지만 이런 함수가 있다는 것을 정의해둔다, 실제 함수는 MainActivity에 있고 그 함수가 콜백되는 것
     interface ItemClick {
         fun onClick(view: View, position: Int)
     }
@@ -20,10 +21,10 @@ class MyAdapter(val mItems: MutableList<MyItem>) : RecyclerView.Adapter<MyAdapte
         fun onLongClick(view: View, position: Int)
     }
 
-    // 클릭 이벤트 추가 부분
+    // 인터페이스 타입의 itemClick 생성
     var itemClick: ItemClick? = null
 
-    // 롱클릭 이벤트 추가 부분
+    // 인터페이스 타입의 itemLongClick 생성
     var itemLongClick: ItemLongClick? = null
 
     // 리사이클러 뷰가 자동으로 호출시키는 메서드
@@ -48,7 +49,7 @@ class MyAdapter(val mItems: MutableList<MyItem>) : RecyclerView.Adapter<MyAdapte
         val dec = DecimalFormat("#,###")
         // 인터페이스
         // 클릭 이벤트 추가 부분(여기서 해도 됨) / 지금 이 코드에선 클릭이벤트 받아서 매인엑티비티에 보내주고 메인액티비티에서 처리함
-        // 메인 액티비티로 보내주려면 메인액티비티랑 어뎁터 사이에 통신가능한 인터페이스를 생성해줘야 한다 = 14라인
+        // 메인 액티비티로 보내주려면 메인액티비티랑 어뎁터 사이에 통신가능한 인터페이스를 생성해줘야 한다 = 16라인
 //        Log.d("MyAdapter", "onBindViewHolder() position = $position")
         holder.itemView.setOnClickListener {
             itemClick?.onClick(it, position)

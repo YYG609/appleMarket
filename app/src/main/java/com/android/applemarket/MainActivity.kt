@@ -232,6 +232,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         // 좋아요 기능
+        // registerForActivityResult로 DetailActivity에서 isLike가 true인지 false인지를 받아온다
         activityResultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
                 if (it.resultCode == RESULT_OK) {
@@ -247,6 +248,10 @@ class MainActivity : AppCompatActivity() {
                             dataList[itemIndex].like -= 1
                         }
                     }
+                    // 중요 //
+                    // 위의 데이터리스트 변동과 리사이클러 뷰는 서로 알아서 갱신 X
+                    // 그래서 어댑터를 갱신해주는 코드가 필요함
+                    // adapter.notifyItemChanged(갱신이 필요한 포지션)
                     adapter.notifyItemChanged(itemIndex)
                 }
             }
@@ -259,7 +264,6 @@ class MainActivity : AppCompatActivity() {
         val spAdapter =
             ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, village)
         villageSpinner.adapter = spAdapter
-
 
         // 알림 버튼(상단 종모양) 클릭 시 notification() 호출
         binding.ibNotification.setOnClickListener {
